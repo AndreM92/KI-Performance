@@ -1,0 +1,29 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Logs, Daten, sonstiges
+*.log
+*.sqlite3
+
+# PyCharm / JetBrains
+.idea/
+
+# Betriebssystem-Dateien
+.DS_Store
+Thumbs.db
+
+#Passwörter
+api_keys.py

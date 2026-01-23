@@ -1,24 +1,3 @@
-# pip install openai
-import os
-from api_keys import ChatGPT_key
-from openai import OpenAI, RateLimitError
-# API-Key setzen
-os.environ["OPENAI_API_KEY"] = ChatGPT_key
-# OpenAI-Client initialisieren (ohne Argumente!)
-client = OpenAI()
-
-import re
-
-
-def gpt_chat(prompt):
-    try:
-        response = client.chat.completions.create(
-            model="gpt-5",
-            messages=[{"role": "user", "content": prompt}]
-        )
-        return response.choices[0].message.content.strip()
-    except RateLimitError as e:
-        return f"Rate Limit überschritten: {e}"
 
 def create_table(response):
     for line in response.split('\n'):

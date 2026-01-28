@@ -16,11 +16,11 @@ os.environ["OPENAI_API_KEY"] = ChatGPT_key
 # OpenAI-Client initialisieren (ohne Argumente!)
 client = OpenAI()
 llm_model = "gpt-5.2-chat-latest"
-
-file_path = r"C:\Users\andre\OneDrive\Desktop\Marketing\KI-Performance\KI-Performance Schuhe"
-source_file_filename = "full_responses_sonar_" + ".txt"
-#source_file_filename = "full_responses_gpt-5.2-chat-latest_" + ".txt"
 responses_synthesis_filename = "prompt_responses_synthesis" + ".txt"
+file_path = r"C:\Users\andre\OneDrive\Desktop\Marketing\KI-Performance\KI-Performance Schuhe"
+
+source_file_filename = "full_responses_gpt-5.2-chat-latest" + ".txt"
+model_name = "gpt-5.2-chat-latest"
 ########################################################################################################################
 #Dependencies
 # pip install openai
@@ -48,9 +48,15 @@ if __name__ == '__main__':
         response_synthesis = f.read()
     final_table = []
 
-    responses_list = source_file.split(':\n')
+    responses_list = re.split(r'(?:[1-9]|[1-4]\d|50):\n', source_file)
+
     if not len(responses_list) == 51:
         print(f'Abweichende Anzahl: {len(responses_list)}')
+#        for n, l in enumerate(responses_list):
+#            print(n,l)
+#            if n > 3:
+#                break
+
     for ID, response in enumerate(responses_list):
         if len(response) <= 3:
             continue
@@ -79,5 +85,5 @@ if __name__ == '__main__':
               'Wörtliche Beschreibung der Marke im Chat']
     df_perplexity_responses = pd.DataFrame(final_table,columns=header)
     dt_str_now = datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
-    filename = 'Perplexity_responses_table_' + dt_str_now + '.xlsx'
+    filename = model_name + '_responses_table_' + dt_str_now + '.xlsx'
     df_perplexity_responses.to_excel(filename)

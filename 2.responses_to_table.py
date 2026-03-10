@@ -11,8 +11,7 @@ import pandas as pd
 import requests
 import json
 
-from api_keys import ChatGPT_key, Perplexity_key
-from openai import OpenAI, RateLimitError
+from ki_functions import *
 # API-Key setzen
 os.environ["OPENAI_API_KEY"] = ChatGPT_key
 # OpenAI-Client initialisieren (ohne Argumente!)
@@ -36,10 +35,11 @@ if __name__ == '__main__':
         response_synthesis = response_synthesis.replace('\n',' ')
     final_table = []
     os.chdir('./responses')
+    file_list = sorted([f for f in os.listdir() if '.txt' in f and 'full_responses' in f])
     start_at = 0
-    for n, source_file_filename in enumerate(os.listdir()):
+    for n, source_file_filename in enumerate(file_list):
         print(source_file_filename)
-        if not '.txt' in source_file_filename or not 'full_responses' in source_file_filename or n < start_at:
+        if n < start_at:
             continue
         model_name = source_file_filename.replace('full_responses','').replace('.txt','').replace('_','')
         # Quellendatei mit den Responses im Textformat
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     #            print(n,l)
     #            if n > 3:
     #                break
-
+        break               ####
         for ID, response in enumerate(responses_list):
             if len(response) <= 3:
                 continue
@@ -63,9 +63,8 @@ if __name__ == '__main__':
 
             full_prompt = response_synthesis + "\n" + response
             print(f"{ID}: {response}")
-            table_format = gpt_chat(llm_model, full_prompt)
+            table_format = gpt_chat(client, llm_model, full_prompt)
 #            table_format = perplexity_chat(llm_model, full_prompt)
-
 
             for line in table_format.split('\n'):
                 if not str(line[0]).isdigit():
@@ -82,6 +81,7 @@ if __name__ == '__main__':
                     row.pop(-3)
                 if len(row) > 7 and row[-2] == '':
                     row.pop(-2)
+                print(len(row), row)
                 final_table.append([ID]+row)
 
         header = ['Anfrage', 'Rang', 'Firmenname', 'Markenname', 'Website', 'Produkt', 'Quellen',

@@ -1,5 +1,7 @@
+from api_keys import ChatGPT_key, Perplexity_key
+from openai import OpenAI, RateLimitError
 
-def gpt_chat(llm_model, prompt):
+def gpt_chat(client, llm_model, prompt):
     try:
         response = client.chat.completions.create(
             model=llm_model,
@@ -49,7 +51,7 @@ def extract_text(element):
             return element
         elif len(element) >= 1:
             repl_element = element.replace('\u200b','').replace('\xa0', ' ').replace('\n',' ')
-            new_element = re.sub('\s+', ' ', repl_element).strip()
+            new_element = re.sub(r'\s+', ' ', repl_element).strip()
             return new_element
         else:
             return element

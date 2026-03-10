@@ -1,4 +1,34 @@
 
+def gpt_chat(llm_model, prompt):
+    try:
+        response = client.chat.completions.create(
+            model=llm_model,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        return response.choices[0].message.content.strip()
+    except RateLimitError as e:
+        return f"Rate Limit überschritten: {e}"
+
+
+def perplexity_chat(llm_model, prompt):
+    Perplexity_API_URL = "https://api.perplexity.ai/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {Perplexity_key}",
+        "Content-Type": "application/json",
+    }
+    data = {
+        "model": llm_model,
+        "messages": [
+            {"role": "user", "content": prompt}
+        ]
+    }
+    resp = requests.post(Perplexity_API_URL, headers=headers, data=json.dumps(data))
+    resp.raise_for_status()  # wirft Fehler bei HTTP-Problem
+    body = resp.json()
+    # einfache Text-Ausgabe aus der ersten Choice
+    return body["choices"][0]["message"]["content"]
+
+
 def create_table(response):
     for line in response.split('\n'):
         line = line.replace('"','')

@@ -48,11 +48,11 @@ if __name__ == '__main__':
         responses_list = re.split(r'(?:[1-9]|[1-4]\d|50):\n', source_file)
         if not len(responses_list) == 51:
             print(f'Abweichende Anzahl: {len(responses_list)}')
-    #        for n, l in enumerate(responses_list):
-    #            print(n,l)
-    #            if n > 3:
-    #                break
-        break               ####
+#            for n, l in enumerate(responses_list):
+#                print(n,l)
+#                if n > 3:
+#                    break
+
         for ID, response in enumerate(responses_list):
             if len(response) <= 3:
                 continue
@@ -72,6 +72,7 @@ if __name__ == '__main__':
                 row = line.split(';')
                 if len(row) != 7:
                     print(f'Abweichende Spalten: {len(row)}')
+                    print(len(row), row)
                 if len(row) < 7:
                     if 'http' in row[3]:
                         row.insert(4, '')
@@ -81,7 +82,6 @@ if __name__ == '__main__':
                     row.pop(-3)
                 if len(row) > 7 and row[-2] == '':
                     row.pop(-2)
-                print(len(row), row)
                 final_table.append([ID]+row)
 
         header = ['Anfrage', 'Rang', 'Firmenname', 'Markenname', 'Website', 'Produkt', 'Quellen',

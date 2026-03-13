@@ -21,3 +21,4 @@ Thumbs.db
 
 #Passwörter
 api_keys.py
+search_crawler_credentials.py

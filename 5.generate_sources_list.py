@@ -12,6 +12,7 @@ from urllib.parse import urlparse
 
 file_path = r"C:\Users\andre\OneDrive\Desktop\Marketing\KI-Performance\KI-Performance Schuhe"
 company_list = "Firmenliste_KI_Schuhe_20260320" + ".xlsx"
+company_archive = r"C:\Users\andre\OneDrive\Desktop\Marketing\KI-Performance\Firmenliste_Archiv.xlsx"
 source_file = "KI-Performance Schuhe_2026-01-20" + ".xlsx"
 sheet_names = ["ChatGPT", "Claude", "Copilot", "DeepSeek", "Gemini", "Grok", "LLaMA", "Mistral", "Perplexity", "Qwen"]
 ########################################################################################################################
@@ -84,8 +85,8 @@ def find_category(df_companies, l_part, brand_search = False, company_search = F
     found_brand = None
     found_category = None
     for ID, row in df_companies.iterrows():
-        brand = row['Markenname']
-        company = row['Firmenname']
+        brand = str(row['Marke']).strip()
+        company = str(row['Firma']).strip()
         website = str(row['Website'])
         category = row['Anbietergruppe']
         match = False
@@ -140,8 +141,11 @@ if __name__ == '__main__':
         base_urls.add(l_ex)
     base_url_list = sorted(base_urls)
 
-    # Kategorisierung der Links auf Basis der Firmenliste
+    # Kategorisierung der Links auf Basis der Firmenlisten
     df_companies = pd.read_excel(company_list)
+    df_company_archive = pd.read_excel(company_archive)
+    df_companies = pd.concat([df_companies, df_company_archive], ignore_index=True)
+
     url_dict = {}
     for bl in base_url_list:
         l_part = bl.replace('https://','').replace('http://','').replace('www.','').strip('/').strip()
@@ -162,6 +166,7 @@ if __name__ == '__main__':
     dt_str_now = datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
     filename = 'Quellenliste_BasisURLs_' + dt_str_now + '.xlsx'
     url_df.to_excel(filename)
+    print('finished')
 
 
 # Nachrecherche per KI

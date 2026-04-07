@@ -19,7 +19,7 @@ client = OpenAI()
 llm_model = "gpt-5.4"
 #llm_model = "sonar"
 responses_synthesis_filename = "prompt_responses_synthesis" + ".txt"
-file_path = r"C:\Users\andre\OneDrive\Desktop\Marketing\KI-Performance\KI-Performance Schuhe"
+file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Versicherungen 2026"
 ########################################################################################################################
 #Dependencies
 # pip install openai
@@ -37,6 +37,7 @@ if __name__ == '__main__':
     os.chdir('./responses')
     file_list = sorted([f for f in os.listdir() if '.txt' in f and 'full_responses' in f])
     start_at = 0
+
     for n, source_file_filename in enumerate(file_list):
         print(source_file_filename)
         if n < start_at:
@@ -45,17 +46,25 @@ if __name__ == '__main__':
         # Quellendatei mit den Responses im Textformat
         with open(source_file_filename, "r", encoding="utf-8") as f:
             source_file = f.read()
+        patterns = re.findall(r'(?:[1-9]|[1-4]\d|50):\n', source_file)
         responses_list = re.split(r'(?:[1-9]|[1-4]\d|50):\n', source_file)
         if not len(responses_list) == 51:
             print(f'Abweichende Anzahl: {len(responses_list)}')
+            print(patterns)
+            continue
 #            for n, l in enumerate(responses_list):
 #                print(n,l)
 #                if n > 3:
 #                    break
 
         for ID, response in enumerate(responses_list):
+            if ID <= 1:
+                continue
+
             if len(response) <= 3:
                 continue
+            if str(ID) not in patterns[ID-1]:
+                break
             if str(response).count('\n') >= 1:
                 response_s = response.rsplit('\n',1)[0]
                 if len(response) - len(response_s) < 4:
@@ -76,35 +85,26 @@ if __name__ == '__main__':
                 if len(row) < 7:
                     if 'http' in row[3]:
                         row.insert(4, '')
-                    else:
-                        row.insert(-1,'')
-                if len(row) > 7 and row[-3] == '':
-                    row.pop(-3)
-                if len(row) > 7 and row[-2] == '':
-                    row.pop(-2)
                 final_table.append([ID]+row)
 
-        header = ['Anfrage', 'Rang', 'Firmenname', 'Markenname', 'Website', 'Produkt', 'Quellen',
+        new_table = []
+        for row in final_table:
+#            print(len(row), row)
+            if len(row) >= 8:
+                overhang = [str(e).strip() for e in row[7:] if len(str(e).strip()) > 4]
+                row = row[:7] + ['; '.join(overhang)]
+#                print(len(row), row)
+            if len(row) < 8:
+                if 'http' in row[3]:
+                    row.insert(4, '')
+                else:
+                    row.insert(-1, '')
+#                    print(len(row), row)
+            new_table.append(row)
+
+        header = ['Anfrage', 'Rang', 'Firma', 'Marke', 'Website', 'Produkt', 'Quellen',
                   'Wörtliche Beschreibung der Marke im Chat']
-        df_responses = pd.DataFrame(final_table,columns=header)
+        df_responses = pd.DataFrame(new_table,columns=header)
         dt_str_now = datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
         filename = model_name + '_responses_table_' + dt_str_now + '.xlsx'
         df_responses.to_excel(filename)
-
-'''
-new_table = []
-for row in final_table:
-    if len(row) != 8:
-        print(len(row), row)
-    if len(row) < 8:
-        if 'http' in row[3]:
-            row.insert(4, '')
-        else:
-            row.insert(-1, '')
-    if len(row) > 8 and row[-3] == '':
-        row.pop(-3)
-    if len(row) > 8 and row[-2] == '':
-        row.pop(-2)
-        print(len(row),row)
-    new_table.append(row)
-'''

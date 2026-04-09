@@ -57,6 +57,7 @@ if __name__ == '__main__':
     categories_table = pd.read_excel(source_file,sheet_name='Suchanfragen_Statistik')
     dict_tables_brands = {}
     dict_tables_groups = {}
+    df_llms_groups = pd.DataFrame()
     score_cols = [str(i) for i in range(1, 51)]
     exclude_cols = ["Firma", "Website", "Quellen", "Beschreibung","Anzahl","Durchschnittsrang", "Gesamtpunkte", "Rang"]
 
@@ -87,9 +88,19 @@ if __name__ == '__main__':
         dict_tables_brands[s] = df_cat_brands
         dict_tables_groups[s] = df_cat_groups
 
+        # Zusammenfassende Tabelle mit LLMs nach Produktkategorien
+        row = df_cat_brands[category_cols].sum()
+        df_llms_groups.loc[s, category_cols] = row
+
     # Punkte der LLMs aufsummieren
     dict_tables_brands = sum_tables(dict_tables_brands, category_cols)
     dict_tables_groups = sum_tables(dict_tables_groups, category_cols)
+    # NaN vermeiden
+    df_llms_groups = df_llms_groups.fillna(0).infer_objects(copy=False)
+    # Gesamtspalte
+    df_llms_groups['Gesamt'] = df_llms_groups.sum(axis=1)
+    # Gesamtzeile
+    df_llms_groups.loc['Gesamt'] = df_llms_groups.sum(axis=0)
 
     # Export in zwei Dateien mit jeweils 10 Tabs zu den LLMs sowie der Zusammenfassenden Tabelle
     dt_str_now = datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
@@ -101,4 +112,5 @@ if __name__ == '__main__':
     with pd.ExcelWriter(agg_tables_groups, engine='xlsxwriter') as writer:
         for title, df in dict_tables_groups.items():
             df.to_excel(writer, sheet_name=title)
+        df_llms_groups.to_excel(writer, sheet_name='LLMs nach Produktkategorien')
     print('finished')

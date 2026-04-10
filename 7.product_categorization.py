@@ -58,6 +58,7 @@ if __name__ == '__main__':
     dict_tables_brands = {}
     dict_tables_groups = {}
     df_llms_groups = pd.DataFrame()
+    df_categories_llms = pd.DataFrame()
     score_cols = [str(i) for i in range(1, 51)]
     exclude_cols = ["Firma", "Website", "Quellen", "Beschreibung","Anzahl","Durchschnittsrang", "Gesamtpunkte", "Rang"]
 
@@ -84,6 +85,7 @@ if __name__ == '__main__':
         # Kategorien aggregieren
         df_cat_brands, category_cols = aggregate_groups(categories_table, score_cols, source_table_brands, df_cat_brands)
         df_cat_groups, category_cols = aggregate_groups(categories_table, score_cols, source_table_groups, df_cat_groups)
+        df_cat_groups = df_cat_groups.sort_values(by='Anbietergruppe', key=lambda col: col.str.lower()).reset_index(drop=True)
 
         dict_tables_brands[s] = df_cat_brands
         dict_tables_groups[s] = df_cat_groups
@@ -92,15 +94,21 @@ if __name__ == '__main__':
         row = df_cat_brands[category_cols].sum()
         df_llms_groups.loc[s, category_cols] = row
 
+        # Zusammenfassende Tabelle mit Anbietergruppen nach LLMs
+        series = df_cat_groups.set_index('Anbietergruppe')['Gesamtpunkte']
+        df_categories_llms = pd.concat([df_categories_llms, series.rename(s)], axis=1)
+
     # Punkte der LLMs aufsummieren
     dict_tables_brands = sum_tables(dict_tables_brands, category_cols)
     dict_tables_groups = sum_tables(dict_tables_groups, category_cols)
     # NaN vermeiden
     df_llms_groups = df_llms_groups.fillna(0).infer_objects(copy=False)
-    # Gesamtspalte
+    # Gesamtspalten
     df_llms_groups['Gesamt'] = df_llms_groups.sum(axis=1)
-    # Gesamtzeile
+    df_categories_llms['Gesamt'] = df_categories_llms.sum(axis=1)
+    # Gesamtzeilen
     df_llms_groups.loc['Gesamt'] = df_llms_groups.sum(axis=0)
+    df_categories_llms.loc['Gesamt'] = df_categories_llms.sum(axis=0)
 
     # Export in zwei Dateien mit jeweils 10 Tabs zu den LLMs sowie der Zusammenfassenden Tabelle
     dt_str_now = datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
@@ -112,5 +120,7 @@ if __name__ == '__main__':
     with pd.ExcelWriter(agg_tables_groups, engine='xlsxwriter') as writer:
         for title, df in dict_tables_groups.items():
             df.to_excel(writer, sheet_name=title)
-        df_llms_groups.to_excel(writer, sheet_name='LLMs nach Produktkategorien')
+        df_categories_llms.to_excel(writer, sheet_name='Anbietergruppen_LLMs')
+        df_llms_groups.to_excel(writer, sheet_name='LLMs_Produktkategorien')
+
     print('finished')

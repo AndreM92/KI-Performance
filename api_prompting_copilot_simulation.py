@@ -14,22 +14,19 @@ os.environ["OPENAI_API_KEY"] = ChatGPT_key
 client = OpenAI()
 
 # Modell (aktuell sinnvoll für Copilot-ähnliche Tasks)
-llm_model = "gpt-4o"
+llm_model = "gpt-5.5"
 
-file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Versicherungen 2026"
-source_file = "KI-Performance Versicherungen_20260313.xlsx"
-modify_response_filename = "normalize_response_s.txt"
+file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Arzneimittel 2026"
+source_file = "KI-Performance Arzneimittel_20260715" + ".xlsx"
+modify_response_filename = "normalize_response.txt"
 
 system_prompt = """
-Du bist ein neutraler Such- und Analyseassistent ähnlich Microsoft Copilot.
-Arbeite in zwei Schritten:
-1. Interpretiere die Anfrage wie eine Suchmaschine (Informationsbedarf erkennen)
-2. Gib eine strukturierte, neutrale Marktübersicht
-
-Regeln:
-- Keine direkte Produktempfehlung
-- Nenne konkrete Anbieter nur im Kontext einer Marktübersicht
-- Schreibe sachlich und vergleichend
+Du bist ein neutraler Rechercheassistent nach dem Vorbild von Microsoft Copilot.
+Beantworte Fragen sachlich, strukturiert und ausgewogen.
+Gib zunächst eine direkte Antwort, danach Hintergrundinformationen,
+relevante Optionen, Vor- und Nachteile sowie gegebenenfalls Hinweise auf Grenzen oder Unsicherheiten.
+Vermeide Werbung und direkte Kaufempfehlungen.
+Wenn konkrete Produkte genannt werden, dann ausschließlich als Beispiele innerhalb einer Marktübersicht.
 """
 
 introduction = """Beantworte zuerst ausschließlich inhaltlich die folgende Frage so,
@@ -45,8 +42,7 @@ def send_prompt(model, system_prompt, user_prompt):
             input=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
-            ],
-            temperature=0.6
+            ]
         )
 
         return response.output_text.strip()
@@ -77,7 +73,7 @@ def main(row, number_name, prompt_name, modify_response):
     print(f"{number}: {prompt}")
     response = send_prompt(llm_model, system_prompt, full_prompt)
     response_clean = re.sub(r"\n{2,}", "\n", response)
-    response_final = f"{number}:\n{response_clean}"
+    response_final = f"{number}::\n{response_clean}"
     return response_final
 ########################################################################################################################
 
@@ -94,13 +90,12 @@ if __name__ == '__main__':
             number_name = col
         if 'Such' in col:
             prompt_name = col
-    output_file = f"full_responses_{llm_model}.txt"
+    output_file = f"full_responses_Copilot_{llm_model}.txt"
 
     for ID, row in df_source_file.iterrows():
-        if ID <= 4:
+        if ID < 33:
             continue
         response = main(row, number_name, prompt_name, modify_response)
         with open(output_file, "a", encoding="utf-8") as f:
-            f.write(response + "\n\n")
-        print(response)
+            f.write(response + "\n")
         print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))

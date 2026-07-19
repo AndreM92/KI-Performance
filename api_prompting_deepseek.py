@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Iteratives Suchanfragen-Skript für DeepSeek API
+Wiederholt Anfragen bei zu kurzen / ausbleibenden Antworten.
 """
 import os
 import time
@@ -21,6 +22,7 @@ client = OpenAI(
 # Aktuellstes Chat-Modell von DeepSeek (immer die neueste Version)
 # llm_model = "deepseek-chat"
 llm_model = "deepseek-v4-flash"
+llm_model = "deepseek-v4-pro"
 
 file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Arzneimittel 2026"
 source_file = "KI-Performance Arzneimittel_20260715" + ".xlsx"
@@ -30,29 +32,46 @@ introduction = (
     "wie du sie auch beantworten würdest, wenn es keine zusätzlichen "
     "Format- oder Analyseanforderungen gäbe:")
 
+# Konfiguration für Wiederholungsversuche
+MIN_ANSWER_LENGTH = 100   # Mindestlänge der Antwort (in Zeichen)
+MAX_RETRIES = 3          # Maximale Anzahl zusätzlicher Versuche
+
 # Dependencies
 # pip install openpyxl
 # pip install pandas
 # https://platform.deepseek.com/api_keys
 ###############################################################################
 
-def send_prompt(llm_model, prompt):
+def send_prompt(llm_model, prompt, min_length=MIN_ANSWER_LENGTH, max_retries=MAX_RETRIES):
     """
-    Sendet einen Prompt an die DeepSeek-API und gibt die Antwort als Text zurück.
+    Sendet einen Prompt an die DeepSeek-API.
+    Wiederholt die Anfrage, wenn die Antwort kürzer als min_length ist.
     """
-    try:
-        response = client.chat.completions.create(
-            model=llm_model,
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=4096,
-        )
-        # Antworttext aus der ersten (einzigen) Choice extrahieren
-        return response.choices[0].message.content.strip()
-    except RateLimitError as e:
-        return f"Rate Limit überschritten: {e}"
-    except Exception as e:
-        # Allgemeiner Fallback, falls andere Fehler auftreten
-        return f"Fehler bei API-Anfrage: {e}"
+    for attempt in range(1, max_retries + 1):
+        try:
+            response = client.chat.completions.create(
+                model=llm_model,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=4096,
+            )
+            text = response.choices[0].message.content.strip()
+
+            if len(text) >= min_length:
+                return text
+            else:
+                print(f"Antwort zu kurz ({len(text)} Zeichen), "
+                      f"versuche erneut... (Versuch {attempt}/{max_retries})")
+                # Nur wiederholen, wenn noch Versuche übrig
+                if attempt == max_retries:
+                    return (f"Hinweis: Keine ausreichend lange Antwort "
+                            f"nach {max_retries} Versuchen.\nLetzte Antwort:\n{text}")
+        except RateLimitError as e:
+            return f"Rate Limit überschritten: {e}"
+        except Exception as e:
+            return f"Fehler bei API-Anfrage: {e}"
+
+    # Wenn alle Versuche fehlschlugen, letzte (kurze) Antwort zurückgeben oder Hinweis
+    return f"Fehlgeschlagen: Keine ausreichend lange Antwort nach {max_retries} Versuchen."
 
 
 def main(row, number_name, prompt_name):
@@ -84,7 +103,10 @@ if __name__ == '__main__':
         if 'Such' in n:
             prompt_name = n
 
+    start_at = 32
     for ID, row in df_source_file.iterrows():
+        if ID < start_at - 1:
+            continue
         response = main(row, number_name, prompt_name)
 
         # Antwort an Textdatei anhängen
@@ -96,3 +118,4 @@ if __name__ == '__main__':
 
         # Kurze Pause zum Schutz vor IP/Rate-Limits
         time.sleep(1)
+        break

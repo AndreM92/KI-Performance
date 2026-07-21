@@ -17,8 +17,8 @@ os.environ["ANTHROPIC_API_KEY"] = Claude_key
 client = Anthropic()
 llm_model = "claude-sonnet-5"
 
-file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Versicherungen 2026"
-source_file = "KI-Performance Versicherungen_20260313" + ".xlsx"
+file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Arzneimittel 2026"
+source_file = "KI-Performance Arzneimittel_20260715" + ".xlsx"
 modify_response_filename = "normalize_response.txt"
 introduction = "Beantworte zuerst ausschließlich inhaltlich die folgende Frage so, wie du sie auch beantworten würdest, wenn es keine zusätzlichen Format- oder Analyseanforderungen gäbe:"
 
@@ -28,16 +28,18 @@ introduction = "Beantworte zuerst ausschließlich inhaltlich die folgende Frage 
 # pip install tabulate
 # https://console.anthropic.com/settings/keys
 ########################################################################################################################
-
-def send_prompt(llm_model, prompt):
+def send_prompt(llm_model, full_prompt):
     try:
         response = client.messages.create(
             model=llm_model,
-            max_tokens=4096,
-            messages=[{"role": "user", "content": prompt}],
+            max_tokens=10000,
+            tools=[{
+                "type": "web_search_20250305",
+                "name": "web_search",
+                "max_uses": 5,
+            }],
+            messages=[{"role": "user", "content": full_prompt}]
         )
-        # response.content kann mehrere Blöcke enthalten (z.B. ThinkingBlock + TextBlock).
-        # Deshalb gezielt den/die TextBlock(s) herausfiltern statt content[0] zu nehmen.
         text_parts = [block.text for block in response.content if block.type == "text"]
         return "".join(text_parts).strip()
     except RateLimitError as e:
@@ -71,8 +73,7 @@ if __name__ == '__main__':
 #            continue
         response = main(row, number_name, prompt_name)
         # Speichern der Antworten als Textdatei
-        with open("full_responses_" + llm_model + "_.txt", "a", encoding="utf-8") as f:
+        with open("full_responses_" + llm_model + ".txt", "a", encoding="utf-8") as f:
             f.write(response + "\n")
         dt_str_now = datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
         print(dt_str_now)
-        break

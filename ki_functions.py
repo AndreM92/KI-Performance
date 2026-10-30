@@ -1,3 +1,7 @@
+import re
+import json
+import requests
+
 from api_keys import ChatGPT_key, Perplexity_key
 from openai import OpenAI, RateLimitError
 

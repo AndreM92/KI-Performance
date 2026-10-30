@@ -13,8 +13,8 @@ from perplexity import Perplexity
 API_URL = "https://api.perplexity.ai/chat/completions"
 llm_model = "sonar"
 
-file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Arzneimittel 2026"
-source_file = "KI-Performance Arzneimittel_20260715" + ".xlsx"
+file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
+source_file = "KI-Performance Möbel_20260930" + ".xlsx"
 modify_response_filename = "normalize_response.txt"
 introduction = "Beantworte zuerst ausschließlich inhaltlich die folgende Frage so, wie du sie auch beantworten würdest, wenn es keine zusätzlichen Format- oder Analyseanforderungen gäbe:"
 

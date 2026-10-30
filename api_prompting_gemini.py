@@ -17,10 +17,10 @@ from google.genai.errors import APIError
 os.environ["GEMINI_API_KEY"] = Gemini_key
 # Gemini-Client initialisieren (greift automatisch auf GEMINI_API_KEY zu)
 client = genai.Client()
-llm_model = "gemini-3.5-flash"
+llm_model = "gemini-3.8-flash"
 
-file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Arzneimittel 2026"
-source_file = "KI-Performance Arzneimittel_20260715" + ".xlsx"
+file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
+source_file = "KI-Performance Möbel_20260930" + ".xlsx"
 modify_response_filename = "normalize_response.txt"
 introduction = "Beantworte zuerst ausschließlich inhaltlich die folgende Frage so, wie du sie auch beantworten würdest, wenn es keine zusätzlichen Format- oder Analyseanforderungen gäbe:"
 
@@ -29,7 +29,7 @@ introduction = "Beantworte zuerst ausschließlich inhaltlich die folgende Frage 
 ########################################################################################################################
 def send_prompt(prompt):
     # Liste der Modelle: Erst das Wunschmodell, dann das stabilere Backup-Modell
-    models_to_try = ["gemini-3.5-flash", "gemini-3.1-flash-lite"]
+    models_to_try = [llm_model, "gemini-3.5-flash-lite"]
 
     for model in models_to_try:
         wait_time = 10  # Konstante Wartezeit von 10 Sekunden bei Fehlern
@@ -64,14 +64,14 @@ def send_prompt(prompt):
 
     # Extremfall: Beide Modelle haben nach je 3 Versuchen versagt
     print(
-        "   [WARNUNG] Alle Modelle blockieren. Versuche es nun fortlaufend im 10-Sekunden-Takt mit gemini-2.5-flash...")
+        "   [WARNUNG] Alle Modelle blockieren. Versuche es nun fortlaufend im 10-Sekunden-Takt mit gemini-3.5-flash-lite...")
     while True:
         try:
             response = client.models.generate_content(
-                model="gemini-3.1-flash-lite",
+                model="gemini-3.5-flash-lite",
                 contents=prompt
             )
-            return response.text.strip(), "gemini-3.1-flash-lite (Dauer-Fallback)"
+            return response.text.strip(), "gemini-3.5-flash-lite (Dauer-Fallback)"
         except Exception:
             time.sleep(10)
 

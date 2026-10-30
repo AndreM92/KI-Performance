@@ -14,10 +14,10 @@ os.environ["OPENAI_API_KEY"] = ChatGPT_key
 client = OpenAI()
 
 # Modell (aktuell sinnvoll für Copilot-ähnliche Tasks)
-llm_model = "gpt-5.5"
+llm_model = "gpt-6.1-sol"
 
-file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Arzneimittel 2026"
-source_file = "KI-Performance Arzneimittel_20260715" + ".xlsx"
+file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
+source_file = "KI-Performance Möbel_20260930" + ".xlsx"
 modify_response_filename = "normalize_response.txt"
 
 system_prompt = """
@@ -93,8 +93,6 @@ if __name__ == '__main__':
     output_file = f"full_responses_Copilot_{llm_model}.txt"
 
     for ID, row in df_source_file.iterrows():
-        if ID < 33:
-            continue
         response = main(row, number_name, prompt_name, modify_response)
         with open(output_file, "a", encoding="utf-8") as f:
             f.write(response + "\n")

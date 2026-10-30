@@ -1,6 +1,6 @@
 # !/usr/bin/env python3
 """
-Iteratives Suchanfragen-Skript für ChatGPT gpt-5 API
+Iteratives Suchanfragen-Skript für ChatGPT API (GPT-6.1 Sol)
 """
 import os
 import re
@@ -13,10 +13,10 @@ from openai import OpenAI, RateLimitError
 os.environ["OPENAI_API_KEY"] = ChatGPT_key
 # OpenAI-Client initialisieren (ohne Argumente!)
 client = OpenAI()
-llm_model = "gpt-5.5"
+llm_model = "gpt-6.1-sol"
 
-file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Arzneimittel 2026"
-source_file = "KI-Performance Arzneimittel_20260715" + ".xlsx"
+file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
+source_file = "KI-Performance Möbel_20260930" + ".xlsx"
 modify_response_filename = "normalize_response.txt"
 introduction = "Beantworte zuerst ausschließlich inhaltlich die folgende Frage so, wie du sie auch beantworten würdest, wenn es keine zusätzlichen Format- oder Analyseanforderungen gäbe:"
 

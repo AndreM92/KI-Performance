@@ -15,10 +15,10 @@ os.environ["ANTHROPIC_API_KEY"] = Claude_key
 
 # Anthropic-Client initialisieren
 client = Anthropic()
-llm_model = "claude-sonnet-5"
+llm_model = "claude-sonnet-5-5"
 
-file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Arzneimittel 2026"
-source_file = "KI-Performance Arzneimittel_20260715" + ".xlsx"
+file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
+source_file = "KI-Performance Möbel_20260930" + ".xlsx"
 modify_response_filename = "normalize_response.txt"
 introduction = "Beantworte zuerst ausschließlich inhaltlich die folgende Frage so, wie du sie auch beantworten würdest, wenn es keine zusätzlichen Format- oder Analyseanforderungen gäbe:"
 
@@ -29,18 +29,27 @@ introduction = "Beantworte zuerst ausschließlich inhaltlich die folgende Frage 
 # https://console.anthropic.com/settings/keys
 ########################################################################################################################
 def send_prompt(llm_model, full_prompt):
+    messages = [{"role": "user", "content": full_prompt}]
+    text_parts = []
     try:
-        response = client.messages.create(
-            model=llm_model,
-            max_tokens=10000,
-            tools=[{
-                "type": "web_search_20250305",
-                "name": "web_search",
-                "max_uses": 5,
-            }],
-            messages=[{"role": "user", "content": full_prompt}]
-        )
-        text_parts = [block.text for block in response.content if block.type == "text"]
+        # Bei längerer Websuche pausiert die API den Turn (stop_reason "pause_turn") -> Antwort anhängen und fortsetzen
+        for _ in range(5):
+            response = client.messages.create(
+                model=llm_model,
+                max_tokens=16000,
+                tools=[{
+                    "type": "web_search_20260209",
+                    "name": "web_search",
+                    "max_uses": 5,
+                }],
+                messages=messages
+            )
+            text_parts += [block.text for block in response.content if block.type == "text"]
+            if response.stop_reason == "refusal":
+                text_parts.append(f"\n[Antwort verweigert: {response.stop_details}]")
+            if response.stop_reason != "pause_turn":
+                break
+            messages.append({"role": "assistant", "content": response.content})
         return "".join(text_parts).strip()
     except RateLimitError as e:
         return f"Rate Limit überschritten: {e}"

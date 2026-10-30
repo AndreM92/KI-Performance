@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Iteratives Suchanfragen-Skript für xAI Grok API (Grok 4.5)
+Iteratives Suchanfragen-Skript für xAI Grok API (Grok 4.7)
 Wiederholt Anfragen bei zu kurzen / ausbleibenden Antworten.
 """
 
@@ -20,10 +20,10 @@ client = OpenAI(
 )
 
 # Bestes aktuelles Modell
-llm_model = "grok-4.5"
+llm_model = "grok-4.7"
 
-file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Arzneimittel 2026"
-source_file = "KI-Performance Arzneimittel_20260715.xlsx"
+file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
+source_file = "KI-Performance Möbel_20260930.xlsx"
 modify_response_filename = "normalize_response.txt"
 
 introduction = (
@@ -46,7 +46,7 @@ def send_prompt(llm_model, prompt, min_length=MIN_ANSWER_LENGTH, max_retries=MAX
             response = client.chat.completions.create(
                 model=llm_model,
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=8192,  # Grok 4.5 unterstützt deutlich mehr
+                max_tokens=8192,  # Grok 4.7 unterstützt deutlich mehr
 #                temperature=0.7,  # Optional: leicht kreativer als DeepSeek-Default
             )
             text = response.choices[0].message.content.strip()

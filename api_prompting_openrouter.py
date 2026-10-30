@@ -15,21 +15,21 @@ client = OpenAI(
     base_url="https://openrouter.ai/api/v1", # OpenRouter Endpoint
     default_headers={
         "HTTP-Referer": "https://localhost", # Pflichtfeld bei OpenRouter
-        "X-Title": "KI-Performance Arzneimittel Benchmark"
+        "X-Title": "KI-Performance Moebel Benchmark"
     }
 )
 
-# Für Kimi K3:
-llm_model = "moonshotai/kimi-k3"
-# Für Meta/ LLaMA
+# Für Kimi K3.1 Pro:
+llm_model = "moonshotai/kimi-k3.1-pro"
+# Für Meta/ LLaMA (weiterhin neuestes Llama-Modell auf OpenRouter)
 llm_model = "meta-llama/llama-4-maverick"
 # Für Mistral
-llm_model = "mistralai/mistral-medium-3-5"
+llm_model = "mistralai/mistral-large-4-0"
 # Für Qwen
-llm_model = "qwen/qwen3.7-max"
+llm_model = "qwen/qwen3.8-max-0902"
 
-file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Arzneimittel 2026"
-source_file = "KI-Performance Arzneimittel_20260715.xlsx"
+file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
+source_file = "KI-Performance Möbel_20260930.xlsx"
 modify_response_filename = "normalize_response.txt"
 introduction = "Beantworte zuerst ausschließlich inhaltlich die folgende Frage so, wie du sie auch beantworten würdest, wenn es keine zusätzlichen Format- oder Analyseanforderungen gäbe:"
 

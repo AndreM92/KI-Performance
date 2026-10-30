@@ -21,11 +21,11 @@ client = OpenAI(
 
 # Aktuellstes Chat-Modell von DeepSeek (immer die neueste Version)
 # llm_model = "deepseek-chat"
-llm_model = "deepseek-v4-flash"
+llm_model = "deepseek-flash"
 llm_model = "deepseek-v4-pro"
 
-file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Arzneimittel 2026"
-source_file = "KI-Performance Arzneimittel_20260715" + ".xlsx"
+file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
+source_file = "KI-Performance Möbel_20260930" + ".xlsx"
 modify_response_filename = "normalize_response.txt"
 introduction = (
     "Beantworte zuerst ausschließlich inhaltlich die folgende Frage so, "
@@ -52,7 +52,7 @@ def send_prompt(llm_model, prompt, min_length=MIN_ANSWER_LENGTH, max_retries=MAX
             response = client.chat.completions.create(
                 model=llm_model,
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=4096,
+                max_tokens=8192,
             )
             text = response.choices[0].message.content.strip()
 
@@ -103,7 +103,7 @@ if __name__ == '__main__':
         if 'Such' in n:
             prompt_name = n
 
-    start_at = 32
+    start_at = 1
     for ID, row in df_source_file.iterrows():
         if ID < start_at - 1:
             continue
@@ -118,4 +118,3 @@ if __name__ == '__main__':
 
         # Kurze Pause zum Schutz vor IP/Rate-Limits
         time.sleep(1)
-        break

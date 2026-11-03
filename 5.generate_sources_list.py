@@ -10,11 +10,11 @@ import pandas as pd
 import tldextract
 from urllib.parse import urlparse
 
-file_path = r"C:\Users\andre\OneDrive\Desktop\Marketing\KI-Performance\KI-Performance Schuhe"
-company_list = "Firmenliste_KI_Schuhe_20260320" + ".xlsx"
+file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
+company_list = "Firmenliste_KI-Performance Möbel 2026.xlsx"
 company_archive = r"C:\Users\andre\OneDrive\Desktop\Marketing\KI-Performance\Firmenliste_Archiv.xlsx"
-source_file = "KI-Performance Schuhe_2026-01-20" + ".xlsx"
-sheet_names = ["ChatGPT", "Claude", "Copilot", "DeepSeek", "Gemini", "Grok", "LLaMA", "Mistral", "Perplexity", "Qwen"]
+source_file = "KI-Performance Möbel_20260930" + ".xlsx"
+sheet_names = ["ChatGPT", "Claude", "Copilot", "DeepSeek", "Gemini", "Grok", "Muse Spark", "Mistral", "Perplexity", "Qwen"]
 ########################################################################################################################
 # pip install tldextract
 # Im Rahmen dieser Analyse werden die Quellen-Urls aus den Promptdaten vereinheitlicht, indem aus allen Varianten einer

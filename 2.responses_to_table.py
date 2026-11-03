@@ -19,7 +19,7 @@ os.environ["OPENAI_API_KEY"] = ChatGPT_key
 client = OpenAI()
 llm_model = "gpt-5.5"
 
-# Verzeichnis für die gesicherten Rohantworten (wird unter ./Responses angelegt)
+# Verzeichnis für die gesicherten Rohantworten (wird im Studienordner angelegt)
 RAW_DIR = "raw_tables"
 
 # Maximale Anzahl an Fortsetzungs-Anfragen, falls eine Antwort abgeschnitten wurde.
@@ -27,7 +27,7 @@ RAW_DIR = "raw_tables"
 MAX_FORTSETZUNGEN = 5
 
 responses_synthesis_filename = "prompt_responses_synthesis" + ".txt"
-file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Arzneimittel 2026"
+file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
 ########################################################################################################################
 # Dependencies
 # pip install openai
@@ -124,7 +124,7 @@ if __name__ == '__main__':
         response_synthesis = f.read()
     if '\n' in response_synthesis:
         response_synthesis = response_synthesis.replace('\n', ' ')
-    os.chdir('./Responses')
+    # Die Antwortdateien liegen direkt im Studienordner
 
     # Verzeichnis für Rohantworten anlegen
     os.makedirs(RAW_DIR, exist_ok=True)

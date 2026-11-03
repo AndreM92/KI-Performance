@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Iteratives Suchanfragen-Skript für xAI Grok API (Grok 4.7)
+Iteratives Suchanfragen-Skript für xAI Grok API (kostenlose Grok-Version, mit Websuche)
 Wiederholt Anfragen bei zu kurzen / ausbleibenden Antworten.
 """
 
@@ -19,8 +19,8 @@ client = OpenAI(
     base_url="https://api.x.ai/v1",  # xAI-Endpunkt
 )
 
-# Bestes aktuelles Modell
-llm_model = "grok-4.7"
+# Kostenlose Nutzer auf grok.com erhalten nicht das Flaggschiff (4.6/4.7), sondern ein kleineres Modell (laut Berichten Grok-4.3-Klasse)
+llm_model = "grok-4.3"
 
 file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
 source_file = "KI-Performance Möbel_20260930.xlsx"
@@ -43,13 +43,12 @@ def send_prompt(llm_model, prompt, min_length=MIN_ANSWER_LENGTH, max_retries=MAX
     """Sendet einen Prompt an die xAI Grok API mit Retry-Logik."""
     for attempt in range(1, max_retries + 1):
         try:
-            response = client.chat.completions.create(
+            response = client.responses.create(
                 model=llm_model,
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=8192,  # Grok 4.7 unterstützt deutlich mehr
-#                temperature=0.7,  # Optional: leicht kreativer als DeepSeek-Default
+                tools=[{"type": "web_search"}],  # Websuche wie auf grok.com
+                input=prompt,
             )
-            text = response.choices[0].message.content.strip()
+            text = response.output_text.strip()
 
             if len(text) >= min_length:
                 return text

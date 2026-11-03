@@ -6,11 +6,11 @@ from datetime import datetime, timedelta
 import pandas as pd
 # pip install xlsxwriter
 
-file_path = r"C:\Users\andre\OneDrive\Desktop\Marketing\KI-Performance\KI-Performance Schuhe"
-company_list = "Firmenliste_KI_Schuhe_20260320" + ".xlsx"
+file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
+company_list = "Firmenliste_KI-Performance Möbel 2026.xlsx"
 company_archive = r"C:\Users\andre\OneDrive\Desktop\Marketing\KI-Performance\Firmenliste_Archiv.xlsx"
-source_file = "KI-Performance Schuhe_2026-01-20" + ".xlsx"
-sheet_names = ["ChatGPT", "Claude", "Copilot", "DeepSeek", "Gemini", "Grok", "LLaMA", "Mistral", "Perplexity", "Qwen"]
+source_file = "KI-Performance Möbel_20260930" + ".xlsx"
+sheet_names = ["ChatGPT", "Claude", "Copilot", "DeepSeek", "Gemini", "Grok", "Muse Spark", "Mistral", "Perplexity", "Qwen"]
 ########################################################################################################################
 # Nach Erstellung und Bereinigung der vollständigen Anbieterliste (inklusive erneuter Zuordnung zu den Anbietergruppen)
 # wird diese Liste importiert und mit allen Promptergebnissen abgeglichen.

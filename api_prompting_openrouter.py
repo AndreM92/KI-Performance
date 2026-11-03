@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Iteratives Suchanfragen-Skript für Meta über OpenRouter API
+Iteratives Suchanfragen-Skript für Meta AI, Mistral, Qwen und Kimi über OpenRouter API (mit Websuche)
 Wiederholt Anfragen bei zu kurzen / ausbleibenden Antworten.
 """
 
-import os, time, pandas as pd
+import os, sys, time, pandas as pd
 from datetime import datetime
 from openai import OpenAI, RateLimitError
 
@@ -21,12 +21,16 @@ client = OpenAI(
 
 # Für Kimi K3.1 Pro:
 llm_model = "moonshotai/kimi-k3.1-pro"
-# Für Meta/ LLaMA (weiterhin neuestes Llama-Modell auf OpenRouter)
-llm_model = "meta-llama/llama-4-maverick"
-# Für Mistral
-llm_model = "mistralai/mistral-large-4-0"
-# Für Qwen
-llm_model = "qwen/qwen3.8-max-0902"
+# Für Meta AI (läuft seit April 2026 nicht mehr mit Llama, sondern mit Muse Spark)
+llm_model = "meta/muse-spark-1.3"
+# Für Mistral (Standardmodell in Le Chat/Vibe)
+llm_model = "mistralai/mistral-medium-3-5"
+# Für Qwen (Standardmodell neuer Chats in Qwen Chat)
+llm_model = "qwen/qwen3.7-plus"
+# Optional: Modell und Startnummer beim Aufruf angeben, z. B. python api_prompting_openrouter.py meta/muse-spark-1.3 10
+if len(sys.argv) > 1:
+    llm_model = sys.argv[1]
+start_at = int(sys.argv[2]) if len(sys.argv) > 2 else 1
 
 file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
 source_file = "KI-Performance Möbel_20260930.xlsx"
@@ -49,6 +53,7 @@ def send_prompt(model, prompt):
             resp = client.chat.completions.create(
                 model=model,
                 messages=[{"role": "user", "content": prompt}],
+                extra_body={"plugins": [{"id": "web", "max_results": 5}]},  # Websuche wie in den Chat-Apps
 #                max_tokens=8192,
 #                temperature=0.7
             )
@@ -95,7 +100,6 @@ if __name__ == '__main__':
     safe_model_name = llm_model.replace("/", "_").replace(":", "_").replace("-", "_")
     output_filename = f"full_responses_{safe_model_name}.txt"
 
-    start_at = 1
     for ID, row in df_source_file.iterrows():
         if ID < start_at - 1:
             continue

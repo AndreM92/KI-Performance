@@ -4,9 +4,9 @@ import re
 from datetime import datetime, timedelta
 import pandas as pd
 
-file_path = r"C:\Users\andre\OneDrive\Desktop\Marketing\KI-Performance\KI-Performance Schuhe"
-source_file = "KI-Performance Schuhe_2026-01-20" + ".xlsx"
-sheet_names = ["ChatGPT", "Claude", "Copilot", "DeepSeek", "Gemini", "Grok", "LLaMA", "Mistral", "Perplexity", "Qwen"]
+file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
+source_file = "KI-Performance Möbel_20260930" + ".xlsx"
+sheet_names = ["ChatGPT", "Claude", "Copilot", "DeepSeek", "Gemini", "Grok", "Muse Spark", "Mistral", "Perplexity", "Qwen"]
 ########################################################################################################################
 # Nach der Berechnung der Punkte für jede Marke und jeden ChatBot werden die Tabellen nach Produktkategorien zusammengefasst
 

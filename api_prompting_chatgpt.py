@@ -1,6 +1,6 @@
 # !/usr/bin/env python3
 """
-Iteratives Suchanfragen-Skript für ChatGPT API (GPT-6.1 Sol)
+Iteratives Suchanfragen-Skript für ChatGPT API (GPT-6 Luna = Standardmodell im kostenlosen ChatGPT, mit Websuche)
 """
 import os
 import re
@@ -8,12 +8,13 @@ import pandas as pd
 from datetime import datetime
 
 from api_keys import ChatGPT_key
+from ki_functions import clean_openai_citations
 from openai import OpenAI, RateLimitError
 # API-Key setzen
 os.environ["OPENAI_API_KEY"] = ChatGPT_key
 # OpenAI-Client initialisieren (ohne Argumente!)
 client = OpenAI()
-llm_model = "gpt-6.1-sol"
+llm_model = "gpt-6-luna"
 
 file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
 source_file = "KI-Performance Möbel_20260930" + ".xlsx"
@@ -29,11 +30,12 @@ introduction = "Beantworte zuerst ausschließlich inhaltlich die folgende Frage 
 
 def send_prompt(llm_model, prompt):
     try:
-        response = client.chat.completions.create(
+        response = client.responses.create(
             model=llm_model,
-            messages=[{"role": "user", "content": prompt}]
+            tools=[{"type": "web_search"}],
+            input=prompt
         )
-        return response.choices[0].message.content.strip()
+        return clean_openai_citations(response.output_text.strip())
     except RateLimitError as e:
         return f"Rate Limit überschritten: {e}"
 

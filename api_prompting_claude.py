@@ -30,7 +30,6 @@ introduction = "Beantworte zuerst ausschließlich inhaltlich die folgende Frage 
 ########################################################################################################################
 def send_prompt(llm_model, full_prompt):
     messages = [{"role": "user", "content": full_prompt}]
-    text_parts = []
     try:
         # Bei längerer Websuche pausiert die API den Turn (stop_reason "pause_turn") -> Antwort anhängen und fortsetzen
         for _ in range(5):
@@ -44,12 +43,14 @@ def send_prompt(llm_model, full_prompt):
                 }],
                 messages=messages
             )
-            text_parts += [block.text for block in response.content if block.type == "text"]
-            if response.stop_reason == "refusal":
-                text_parts.append(f"\n[Antwort verweigert: {response.stop_details}]")
             if response.stop_reason != "pause_turn":
                 break
             messages.append({"role": "assistant", "content": response.content})
+        # Nur die eigentliche Antwort: Textblöcke nach dem letzten Such-/Tool-Block (ohne Zwischentext der Recherche)
+        last_tool = max((i for i, block in enumerate(response.content) if block.type != "text"), default=-1)
+        text_parts = [block.text for block in response.content[last_tool + 1:] if block.type == "text"]
+        if response.stop_reason == "refusal":
+            text_parts.append(f"\n[Antwort verweigert: {response.stop_details}]")
         return "".join(text_parts).strip()
     except RateLimitError as e:
         return f"Rate Limit überschritten: {e}"

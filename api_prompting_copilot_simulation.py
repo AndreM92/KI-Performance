@@ -5,6 +5,7 @@ import pandas as pd
 from datetime import datetime
 
 from api_keys import ChatGPT_key
+from ki_functions import clean_openai_citations
 from openai import OpenAI, RateLimitError
 
 # API-Key setzen
@@ -13,8 +14,8 @@ os.environ["OPENAI_API_KEY"] = ChatGPT_key
 # OpenAI-Client
 client = OpenAI()
 
-# Modell (aktuell sinnvoll für Copilot-ähnliche Tasks)
-llm_model = "gpt-6.1-sol"
+# Modell: GPT-6.1 Sol ist in Copilot nur mit Microsoft-365-Lizenz verfügbar -> GPT-6 Luna für die kostenlose Version
+llm_model = "gpt-6-luna"
 
 file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
 source_file = "KI-Performance Möbel_20260930" + ".xlsx"
@@ -39,13 +40,14 @@ def send_prompt(model, system_prompt, user_prompt):
     try:
         response = client.responses.create(
             model=model,
+            tools=[{"type": "web_search"}],
             input=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ]
         )
 
-        return response.output_text.strip()
+        return clean_openai_citations(response.output_text.strip())
 
     except RateLimitError as e:
         return f"Rate Limit überschritten: {e}"

@@ -16,6 +16,25 @@ def gpt_chat(client, llm_model, prompt):
         return f"Rate Limit überschritten: {e}"
 
 
+def clean_openai_citations(text):
+    """Bereinigt Antworten der OpenAI-Websuche für die URL-Analyse:
+    entfernt den Tracking-Parameter utm_source=openai und ersetzt die automatisch angehängten
+    Zitate "([domain](url))" durch "(url)" bzw. entfernt sie, wenn die URL bereits im Text steht."""
+    text = re.sub(r'\?utm_source=openai&', '?', text)
+    text = re.sub(r'[?&]utm_source=openai(?=[\s)\],]|$)', '', text)
+    citation = re.compile(r'\s*\(\[[^\]]*\]\((https?://[^)\s]+)\)\)')
+    known_urls = set(re.findall(r'https?://[^\s)\],]+', citation.sub('', text)))
+
+    def replace(match):
+        url = match.group(1)
+        if url in known_urls:
+            return ''
+        known_urls.add(url)
+        return f' ({url})'
+
+    return citation.sub(replace, text)
+
+
 def perplexity_chat(llm_model, prompt):
     Perplexity_API_URL = "https://api.perplexity.ai/chat/completions"
     headers = {

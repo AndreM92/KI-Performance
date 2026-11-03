@@ -5,11 +5,11 @@ import re
 from datetime import datetime, timedelta
 import pandas as pd
 
-file_path = r"C:\Users\andre\OneDrive\Desktop\Marketing\KI-Performance\KI-Performance Schuhe"
-data_file = "KI-Performance Schuhe_2026-01-20" + ".xlsx"
-company_file = "Firmenliste_KI_Schuhe_20260320" + ".xlsx"
+file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
+data_file = "KI-Performance Möbel_20260930" + ".xlsx"
+company_file = "Firmenliste_KI-Performance Möbel 2026.xlsx"
 source_file = "Quellenliste_BasisURLs_2026-04-01" + ".xlsx"
-sheet_names = ["ChatGPT", "Claude", "Copilot", "DeepSeek", "Gemini", "Grok", "LLaMA", "Mistral", "Perplexity", "Qwen"]
+sheet_names = ["ChatGPT", "Claude", "Copilot", "DeepSeek", "Gemini", "Grok", "Muse Spark", "Mistral", "Perplexity", "Qwen"]
 ########################################################################################################################
 # Nach der Extraktion der Basis-URLs und deren Kategorisierung erfolgt ein Ranking der meistgenutzten Quellen
 # auf Basis der Gesamtdaten. Die Zuordnung erfolgt durch die Basislink-Liste. Nicht erfasste Links werden ergänzt.

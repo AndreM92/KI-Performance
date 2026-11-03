@@ -21,7 +21,7 @@ from ki_functions import *
 
 chromedriver_path = r"C:\Users\andre\Documents\Python\chromedriver-win64\chromedriver.exe"
 startpage = 'https://www.google.de'
-file_path = r"C:\Users\andre\OneDrive\Desktop\Marketing\KI-Performance\KI-Performance Schuhe"
+file_path = r"C:\Users\andre\OneDrive\Desktop\KI-Performance Möbel 2026"
 file_name = "distinct_brands_2026-03-11_19_28_30"
 source_file = file_name + ".xlsx"
 ########################################################################################################################

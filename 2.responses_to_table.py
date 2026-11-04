@@ -4,8 +4,10 @@ Iteratives Textverarbeitungs-Skript für ChatGPT API
 Dabei werden die Angaben zu den Marken in den Antworten der LLMs extrahiert, durch weitere Recherchen ergänzt und
 im Tabellenformat ausgegeben.
 """
+import csv
 import os
 import re
+import sys
 import time
 from datetime import datetime
 import pandas as pd
@@ -17,7 +19,8 @@ from ki_functions import *
 os.environ["OPENAI_API_KEY"] = ChatGPT_key
 # OpenAI-Client initialisieren (ohne Argumente!)
 client = OpenAI()
-llm_model = "gpt-5.5"
+# gpt-6-luna reicht laut Stichprobe für die Tabellenüberführung und kostet nur rund 1 % von gpt-5.5
+llm_model = "gpt-6-luna"
 
 # Verzeichnis für die gesicherten Rohantworten (wird im Studienordner angelegt)
 RAW_DIR = "raw_tables"
@@ -116,6 +119,25 @@ def pruefe_letzte_zeile(table_format):
         return True  # keine Datenzeilen - wird an anderer Stelle abgefangen
     letzte = daten_zeilen[-1]
     return letzte.count(';') >= 6
+
+
+def zeile_zerlegen(line):
+    """
+    Zerlegt eine Tabellenzeile in maximal 7 Spalten. Berücksichtigt, dass das Modell
+    Felder teils in Anführungszeichen setzt und Firmennamen teils Semikolons enthalten,
+    z. B. "WAFTING (Rechtsträger nicht ermittelt; kein deutscher Rechtsträger)".
+    """
+    if line.startswith('"'):
+        row = next(csv.reader([line], delimiter=';'))
+    else:
+        # Nach der 7. Spalte nicht weiter trennen: Semikolons im
+        # Beschreibungstext zerreißen die Zeile sonst.
+        row = line.split(';', 6)
+        if len(row) == 7 and row[1].count('(') > row[1].count(')'):
+            row = line.split(';', 7)
+            row[1:3] = [row[1] + ';' + row[2]]
+    row = [e.strip() for e in row]
+    return [e[1:-1].strip() if len(e) > 1 and e[0] == e[-1] == '"' else e for e in row]
 ########################################################################################################################
 
 if __name__ == '__main__':
@@ -130,11 +152,13 @@ if __name__ == '__main__':
     os.makedirs(RAW_DIR, exist_ok=True)
 
     file_list = sorted([f for f in os.listdir() if '.txt' in f and 'full_responses' in f])
-    start_at = 1
+    start_at = 0
+    # Optional: nur eine Datei verarbeiten, z. B. python 2.responses_to_table.py 3 (für parallele Läufe)
+    only_file = int(sys.argv[1]) if len(sys.argv) > 1 else None
 
     for n, source_file_filename in enumerate(file_list):
         print(n, source_file_filename)
-        if n < start_at:
+        if n < start_at or (only_file is not None and n != only_file):
             continue
 #        break
 
@@ -187,11 +211,9 @@ if __name__ == '__main__':
             for line in table_format.split('\n'):
                 # Führende Leerzeichen, Markdown-Pipes und Aufzählungszeichen entfernen
                 line = line.strip().lstrip('|').lstrip('-').strip()
-                if not line or not line[0].isdigit():
+                if not line or not line.lstrip('"')[:1].isdigit():
                     continue
-                # Nach der 7. Spalte nicht weiter trennen: Semikolons im
-                # Beschreibungstext zerreißen die Zeile sonst.
-                row = line.split(';', 6)
+                row = zeile_zerlegen(line)
                 if len(row) != 7:
                     print(f'Abweichende Spalten: {len(row)}:')
                     print(row)

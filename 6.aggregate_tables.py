@@ -11,6 +11,9 @@ company_list = "Firmenliste_KI-Performance Möbel 2026.xlsx"
 company_archive = r"C:\Users\andre\OneDrive\Desktop\Marketing\KI-Performance\Firmenliste_Archiv.xlsx"
 source_file = "KI-Performance Möbel_20260930" + ".xlsx"
 sheet_names = ["ChatGPT", "Claude", "Copilot", "DeepSeek", "Gemini", "Grok", "Muse Spark", "Mistral", "Perplexity", "Qwen"]
+# True: Markennamen in Tabs und Firmenliste sind vereinheitlicht und werden exakt verglichen.
+# Der unscharfe Abgleich würde sonst z. B. "OTTO home" auch bei "OTTO" zählen.
+exact_brand_match = True
 ########################################################################################################################
 # Nach Erstellung und Bereinigung der vollständigen Anbieterliste (inklusive erneuter Zuordnung zu den Anbietergruppen)
 # wird diese Liste importiert und mit allen Promptergebnissen abgeglichen.
@@ -24,7 +27,8 @@ def aggregate_table(df_source, df_agg, c_rows):
         ck = get_company_keywords(c_source)
         bvsl = brand_variations(b_source)
         request_prev = ''
-        for r, row in df_source.iterrows():
+        rows_source = df_source[df_source['Marke'].astype(str).str.strip() == b_source] if exact_brand_match else df_source
+        for r, row in rows_source.iterrows():
             request = str(row['Anfrage']).strip()
             if request != request_prev:
                 points = 0
@@ -45,11 +49,11 @@ def aggregate_table(df_source, df_agg, c_rows):
                     desc_name = str(h)
                     break
             desc = request + ': ' + str(row[desc_name]).strip()
-            if (b_source in bvl or b_source in brand or \
+            if exact_brand_match or ((b_source in bvl or b_source in brand or \
                     (any(b in bvsl for b in bvl) and \
                      (any(c.lower() in company.lower() for c in ck) or any(
                          c.lower() in c_source.lower() for c in cvl)))) and not 5 > brand.lower().find(b_source.lower()) > 0\
-                    and not 4 > len(brand) - len(b_source) > 0 :
+                    and not 4 > len(brand) - len(b_source) > 0):
                 if found == False:
                     df_agg.at[ID, request] = r_p
                     found = True

@@ -29,6 +29,10 @@ def aggregate_groups(categories_table, score_cols, source_table, df_cat):
             f"[{s}] Spaltenzuordnung fehlerhaft: "
             f"{col_pointer} von {len(score_cols)} Spalten verarbeitet")
 
+    # Übergreifende bzw. Gesamtkategorien (z. B. "Fachgebietsübergreifend", "Gesamtbranche") immer als letzte Kategorie
+    last = [c for c in category_cols if "übergreifend" in c.lower() or c.lower().startswith("gesamt")]
+    category_cols = [c for c in category_cols if c not in last] + last
+    df_cat = df_cat[[c for c in df_cat.columns if c not in category_cols] + category_cols]
     df_cat["Gesamtpunkte"] = df_cat[category_cols].sum(axis=1)
     df_cat["Häufigkeit"] = (df_cat[category_cols] > 0).sum(axis=1)
     return df_cat, category_cols

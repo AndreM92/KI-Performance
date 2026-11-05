@@ -127,7 +127,9 @@ if __name__ == '__main__':
         df_agg_groups = df_agg.groupby('Anbietergruppe')[c_rows + ['Anzahl', 'Gesamtpunkte']].sum()
 
         # Speichern der Tabellen in einem dictionary mit dem LLM als key
-        dict_tables_brands[s] = df_agg_brands
+        # In den LLM-Tabs nur diese Spalten ausgeben; die ID ist der Index der Tabelle
+        dict_tables_brands[s] = df_agg_brands[['Marke', 'Website', 'Firma', 'Anbietergruppe', 'Quellen', 'Beschreibung'] +
+                                              c_rows + ['Anzahl', 'Durchschnittsrang', 'Gesamtpunkte']]
         dict_tables_groups[s] = df_agg_groups
 
     # Zusammenfassende Tabellen über die LLMs
@@ -138,8 +140,8 @@ if __name__ == '__main__':
         if df_brands_all is None:
             df_brands_all = pd.DataFrame({
                 "Marke": df["Marke"],
-                "Firma": df["Firma"],
                 "Website": df["Website"],
+                "Firma": df["Firma"],
                 "Anbietergruppe": df["Anbietergruppe"],
             })
             df_brands_all_f = df_brands_all.copy()
@@ -176,7 +178,7 @@ if __name__ == '__main__':
     df_brands_all['Gesamtanzahl'] = df_brands_all_f[sheet_names].sum(axis=1)
     df_brands_all['Durchschnittsrang'] = (
         df_brands_all_r[sheet_names].where(df_brands_all_r[sheet_names] > 0).mean(axis=1))
-    df_brands_all = df_brands_all[['Marke', 'Firma', 'Website', 'Anbietergruppe'] + sheet_names +
+    df_brands_all = df_brands_all[['Marke', 'Website', 'Firma', 'Anbietergruppe'] + sheet_names +
                                   ['Gesamtpunkte', 'Gesamtanzahl', 'Durchschnittsrang', 'Alle Quellen',
                                    'Alle Beschreibungen']]
     dict_tables_brands['Insgesamt'] = df_brands_all
